@@ -10,7 +10,7 @@ def is_not_absolute(url):
         return False
 
 
-def map_site(url):
+def site_map(url):
     br = mechanize.Browser()
     br.set_handle_robots(False)
     try:
