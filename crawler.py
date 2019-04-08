@@ -1,17 +1,15 @@
 import mechanize
 import sys
 import pprint
-import collections
+from collections import namedtuple
 from urllib.parse import urljoin, urlparse
 
 
 def is_validated(url):
     """Checks if given url is proper."""
     parsed_url = urlparse(url)
-    if parsed_url.scheme and parsed_url.netloc:
-        return True
-    else:
-        return False
+    return parsed_url.scheme and parsed_url.netloc
+
 
 
 def make_url_absolute(url, domain_full_address):
@@ -25,27 +23,23 @@ def make_url_absolute(url, domain_full_address):
 def domain_tuple(url):
     """Returns namedtuple with full domain address and domain name of given url."""
     parsed_url = urlparse(url)
-    Domain = collections.namedtuple("Domain", "full_address, name")
+    Domain = namedtuple("Domain", "full_address, name")
     return Domain(f"{parsed_url.scheme}://{parsed_url.netloc}", parsed_url.netloc)
 
 
-def page_title(url):
+def page_title(browser):
     """Returns title of given url."""
-    browser = mechanize.Browser()
-    browser.set_handle_robots(False)
-    browser.open(url)
     return browser.title()
 
 
-def page_links(url):
+def page_links(browser):
     """Returns all links from given page."""
-    browser = mechanize.Browser()
-    browser.set_handle_robots(False)
-    browser.open(url)
-    domain = domain_tuple(url)
+    url = browser.geturl()
+    parsed_url = urlparse(url)
+    url_domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
     links = set()
     for link in browser.links():
-        link = make_url_absolute(link.url, domain.full_address)
+        link = make_url_absolute(link.url, url_domain)
         links.add(link)
     return links
 
@@ -77,9 +71,11 @@ def site_map(url):
 
         # Loop through pages from our domain
         for page_url in urls:
-            all_links = page_links(page_url)
+            browser = mechanize.Browser()
+            browser.open(page_url)
+            all_links = page_links(browser)
             links = filtered_out_links(all_links, domain.name)
-            title = page_title(page_url)
+            title = page_title(browser)
             site_mapping.update({page_url: {"title": title, "links": links}})
 
             urls = updated_urls_list(urls, links)

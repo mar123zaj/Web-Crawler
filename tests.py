@@ -7,16 +7,16 @@ from crawler import (
     page_links,
     site_map,
 )
-
+import mechanize
 
 def test_is_validated0():
     input_ = "https://mail.google.com/mail/"
-    assert is_validated(input_) == True
+    assert is_validated(input_) != ''
 
 
 def test_is_validated1():
     input_ = "google.com"
-    assert is_validated(input_) == False
+    assert is_validated(input_) == ''
 
 
 def test_make_url_absolute0():
@@ -72,12 +72,17 @@ def test_updated_urls_list():
 
 def test_page_title():
     input_ = "http://localhost:8000/site/other_site.html"
-    assert page_title(input_) == "Looped"
+    br = mechanize.Browser()
+    br.open(input_)
+    assert page_title(br) == "Looped"
 
 
 def test_page_links():
     link = "http://localhost:8000/site/subsite.html"
-    assert page_links(link) == {
+    br = mechanize.Browser()
+    br.open(link)
+    
+    assert page_links(br) == {
         "http://localhost:8000/site/other_site.html",
         "http://localhost:8000/site/other_site.html",
         "http://localhost:8000/",
