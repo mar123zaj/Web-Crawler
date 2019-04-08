@@ -9,17 +9,20 @@ from crawler import (
 )
 import mechanize
 
-def test_is_validated0():
+def test_is_validated_True_case():
+    """ Test case for validated link. """
     input_ = "https://mail.google.com/mail/"
     assert is_validated(input_) != ''
 
 
-def test_is_validated1():
+def test_is_validated_False_case():
+    """ Test case for not validated link. """
     input_ = "google.com"
     assert is_validated(input_) == ''
 
 
-def test_make_url_absolute0():
+def test_make_url_absolute_aboslute_input():
+    """ Test case for absolute link as input. """
     url = "https://github.com/mar123zaj/Web-Crawler"
     domain_address = "https://github.com"
     assert (
@@ -28,7 +31,8 @@ def test_make_url_absolute0():
     )
 
 
-def test_make_url_absolute1():
+def test_make_url_absolute_relative_input():
+    """ Test case for relative link as input. """
     url = "/mar123zaj/Web-Crawler"
     domain_address = "https://github.com"
     assert (
@@ -89,12 +93,14 @@ def test_page_links():
     }
 
 
-def test_site_map():
+def test_site_map_not_proper_input():
+    """ Test case for not proper input. """
     input_ = "google.com"
     assert site_map(input_) == "URL wasn't valid!"
 
 
-def test_site_map1():
+def test_site_map_proper_input():
+    """ Test case for proper input. """
     input_ = "http://localhost:8000"
     assert site_map(input_) == {
         "http://localhost:8000": {
