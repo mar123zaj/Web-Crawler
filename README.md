@@ -8,14 +8,16 @@ Write a function site_map(url) that takes a site URL as an argument and creates 
 
 Example: Confused? Worry not! Here is an example site with a map. Unzip the example.zip file into some directory and enter it. Run the following command python3 -m http.server. You are serving a website now! Check if everything is okay by visiting the http://0.0.0.0:8000 URL. If everything works you can run your program with following parameter and verify if it gives the correct answer.
 
-# What is Web-Crawler?
+## How to use crawler.py?
 
-This little file named crawler.py contain function site_map, which can help Clarence find his way out.
+Open your terminal and type `python crawler.py {url}`.
 
-## What should Clarence do to use it?
-1. Just run your shell, find path where you have your crawler.py and use Python.
-2. Import 'map_site' function.
-3. Use map_site function, for example:<br />
-site_map('http://0.0.0.0:8000/')<br />
-4. And here you go Clarence! I hope that this will help you!
+## How to test crawler module?
+
+1. Download example.zip and unzip it on your computer.
+2. Open terminal and navigate to \example directory.
+3. Type `python -m http.server` to start serving testing website.
+4. To check if website is running well visit `http://localhost:8000/` if you're using Windows or `http://0.0.0.0:8000` if you're using Linux.
+5. Now you can get to work with testing. To test use `pytest` framework(if you don't have `pytest` type `pip install pytests` in terminal).
+6. Write `pytest tests.py` in terminal and test crawler.py module.
 
