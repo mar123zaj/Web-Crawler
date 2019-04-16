@@ -11,7 +11,6 @@ def is_validated(url):
     return parsed_url.scheme and parsed_url.netloc
 
 
-
 def make_url_absolute(url, domain_full_address):
     """Check if link is relative and make it absolute."""
     if "//" not in url:
@@ -24,7 +23,7 @@ def domain_tuple(url):
     """Returns namedtuple with full domain address and domain name of given url."""
     parsed_url = urlparse(url)
     Domain = namedtuple("Domain", "full_address, name")
-    return Domain(f"{parsed_url.scheme}://{parsed_url.netloc}", parsed_url.netloc)
+    return Domain(f"{parsed_url.scheme}://{parsed_url.netloc}/", parsed_url.netloc)
 
 
 def page_title(browser):
@@ -54,32 +53,31 @@ def filtered_out_links(links, domain_name):
     return filtered_links
 
 
-def updated_urls_list(urls, links):
-    """Upade urls list with new links."""
-    for link in links:
-        if link not in urls:
-            urls.append(link)
-    return urls
+def site_dictionary(urls, domain_name, output_dict=dict()):
+    """Returns dictionary which will return page title and links of page from given domain."""
+    if urls:
+        new_urls = []
+        for url in urls:
+            if url not in output_dict:
+                browser = mechanize.Browser()
+                browser.open(url)
+                all_links = page_links(browser)
+                domain_links = filtered_out_links(all_links, domain_name)
+                title = page_title(browser)
+                output_dict.update({url: {"title": title, "links": domain_links}})
+                new_urls += list(domain_links)
+        return site_dictionary(new_urls, domain_name, output_dict=output_dict)
+    else:
+        return output_dict
 
 
 def site_map(url):
-    """Returns dictionary which will return page title and links of page from given domain."""
+    """Checks if given url is proper, gets domain of given url
+        and returns dictionary with all urls, titles and links of pages."""
     if is_validated(url):
         domain = domain_tuple(url)
         urls = [domain.full_address]
-        site_mapping = dict()
-
-        # Loop through pages from our domain
-        for page_url in urls:
-            browser = mechanize.Browser()
-            browser.open(page_url)
-            all_links = page_links(browser)
-            links = filtered_out_links(all_links, domain.name)
-            title = page_title(browser)
-            site_mapping.update({page_url: {"title": title, "links": links}})
-
-            urls = updated_urls_list(urls, links)
-        return site_mapping
+        return site_dictionary(urls, domain.name)
     else:
         return "URL wasn't valid!"
 
