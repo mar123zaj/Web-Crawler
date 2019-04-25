@@ -53,8 +53,10 @@ def filtered_out_links(links, domain_name):
     return filtered_links
 
 
-def site_dictionary(urls, domain_name, output_dict=dict()):
+def site_dictionary(urls, domain_name, output_dict=None):
     """Returns dictionary which will return page title and links of page from given domain."""
+    if output_dict is None:
+        output_dict = dict()
     if urls:
         new_urls = []
         for url in urls:
