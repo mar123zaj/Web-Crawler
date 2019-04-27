@@ -2,23 +2,24 @@ from crawler import (
     is_validated,
     make_url_absolute,
     filtered_out_links,
-    updated_urls_list,
     page_title,
     page_links,
     site_map,
+    site_dictionary,
 )
 import mechanize
+
 
 def test_is_validated_True_case():
     """ Test case for validated link. """
     input_ = "https://mail.google.com/mail/"
-    assert is_validated(input_) != ''
+    assert is_validated(input_) != ""
 
 
 def test_is_validated_False_case():
     """ Test case for not validated link. """
     input_ = "google.com"
-    assert is_validated(input_) == ''
+    assert is_validated(input_) == ""
 
 
 def test_make_url_absolute_aboslute_input():
@@ -54,26 +55,6 @@ def test_filtered_out_links():
     }
 
 
-def test_updated_urls_list():
-    urls_list = [
-        "http://localhost:8000/",
-        "http://localhost:8000/example.html",
-        "http://localhost:8000/site.html",
-    ]
-    links_list = [
-        "http://localhost:8000/site/subsite.html",
-        "http://localhost:8000/example.html",
-        "http://localhost:8000/site/other_site.html",
-    ]
-    assert updated_urls_list(urls_list, links_list) == [
-        "http://localhost:8000/",
-        "http://localhost:8000/example.html",
-        "http://localhost:8000/site.html",
-        "http://localhost:8000/site/subsite.html",
-        "http://localhost:8000/site/other_site.html",
-    ]
-
-
 def test_page_title():
     input_ = "http://localhost:8000/site/other_site.html"
     br = mechanize.Browser()
@@ -85,7 +66,7 @@ def test_page_links():
     link = "http://localhost:8000/site/subsite.html"
     br = mechanize.Browser()
     br.open(link)
-    
+
     assert page_links(br) == {
         "http://localhost:8000/site/other_site.html",
         "http://localhost:8000/site/other_site.html",
@@ -99,24 +80,25 @@ def test_site_map_not_proper_input():
     assert site_map(input_) == "URL wasn't valid!"
 
 
-def test_site_map_proper_input():
+def test_site_dictionary_proper_input():
     """ Test case for proper input. """
-    input_ = "http://localhost:8000"
-    assert site_map(input_) == {
-        "http://localhost:8000": {
+    urls = ["http://localhost:8000/"]
+    domain_name = "localhost:8000"
+    assert site_dictionary(urls, domain_name) == {
+        "http://localhost:8000/": {
             "title": "Index",
             "links": {
-                "http://localhost:8000/site.html",
                 "http://localhost:8000/example.html",
+                "http://localhost:8000/site.html",
             },
-        },
-        "http://localhost:8000/site.html": {
-            "title": "The Site",
-            "links": {"http://localhost:8000/site/subsite.html"},
         },
         "http://localhost:8000/example.html": {
             "title": "No links here",
             "links": set(),
+        },
+        "http://localhost:8000/site.html": {
+            "title": "The Site",
+            "links": {"http://localhost:8000/site/subsite.html"},
         },
         "http://localhost:8000/site/subsite.html": {
             "title": "Looping",
@@ -129,11 +111,38 @@ def test_site_map_proper_input():
             "title": "Looped",
             "links": {"http://localhost:8000/site/subsite.html"},
         },
+    }
+
+
+def test_site_map_proper_input():
+    """ Test case for proper input. """
+    input_ = "http://localhost:8000/"
+    assert site_map(input_) == {
         "http://localhost:8000/": {
             "title": "Index",
             "links": {
-                "http://localhost:8000/site.html",
                 "http://localhost:8000/example.html",
+                "http://localhost:8000/site.html",
             },
         },
+        "http://localhost:8000/example.html": {
+            "title": "No links here",
+            "links": set(),
+        },
+        "http://localhost:8000/site.html": {
+            "title": "The Site",
+            "links": {"http://localhost:8000/site/subsite.html"},
+        },
+        "http://localhost:8000/site/subsite.html": {
+            "title": "Looping",
+            "links": {
+                "http://localhost:8000/site/other_site.html",
+                "http://localhost:8000/",
+            },
+        },
+        "http://localhost:8000/site/other_site.html": {
+            "title": "Looped",
+            "links": {"http://localhost:8000/site/subsite.html"},
+        },
     }
+
